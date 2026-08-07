@@ -89,6 +89,7 @@ message PlaceBetRequest {
   string round_id = 2;
   Money amount = 3;
   BetSelection selection = 4;
+  string idempotency_key = 5;
 }
 
 
@@ -100,6 +101,7 @@ message PlaceBetResponse {
 message CancelBetRequest {
   RequestContext context = 1;
   string bet_id = 2;
+  string idempotency_key = 3;
 }
 
 

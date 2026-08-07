@@ -112,18 +112,20 @@ class RoomSnapshot(_message.Message):
     def __init__(self, room: _Optional[_Union[RoomSummary, _Mapping]] = ..., participants: _Optional[_Iterable[_Union[RoomParticipantSnapshot, _Mapping]]] = ..., server_time: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class CreateRoomRequest(_message.Message):
-    __slots__ = ("context", "name", "game_type", "visibility", "capacity")
+    __slots__ = ("context", "name", "game_type", "visibility", "capacity", "idempotency_key")
     CONTEXT_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     GAME_TYPE_FIELD_NUMBER: _ClassVar[int]
     VISIBILITY_FIELD_NUMBER: _ClassVar[int]
     CAPACITY_FIELD_NUMBER: _ClassVar[int]
+    IDEMPOTENCY_KEY_FIELD_NUMBER: _ClassVar[int]
     context: _common_pb2.RequestContext
     name: str
     game_type: _common_pb2.GameType
     visibility: RoomVisibility
     capacity: int
-    def __init__(self, context: _Optional[_Union[_common_pb2.RequestContext, _Mapping]] = ..., name: _Optional[str] = ..., game_type: _Optional[_Union[_common_pb2.GameType, str]] = ..., visibility: _Optional[_Union[RoomVisibility, str]] = ..., capacity: _Optional[int] = ...) -> None: ...
+    idempotency_key: str
+    def __init__(self, context: _Optional[_Union[_common_pb2.RequestContext, _Mapping]] = ..., name: _Optional[str] = ..., game_type: _Optional[_Union[_common_pb2.GameType, str]] = ..., visibility: _Optional[_Union[RoomVisibility, str]] = ..., capacity: _Optional[int] = ..., idempotency_key: _Optional[str] = ...) -> None: ...
 
 class CreateRoomResponse(_message.Message):
     __slots__ = ("snapshot", "invite_token")
@@ -172,14 +174,16 @@ class GetRoomSnapshotResponse(_message.Message):
     def __init__(self, snapshot: _Optional[_Union[RoomSnapshot, _Mapping]] = ...) -> None: ...
 
 class JoinRoomRequest(_message.Message):
-    __slots__ = ("context", "room_id", "invite_token")
+    __slots__ = ("context", "room_id", "invite_token", "idempotency_key")
     CONTEXT_FIELD_NUMBER: _ClassVar[int]
     ROOM_ID_FIELD_NUMBER: _ClassVar[int]
     INVITE_TOKEN_FIELD_NUMBER: _ClassVar[int]
+    IDEMPOTENCY_KEY_FIELD_NUMBER: _ClassVar[int]
     context: _common_pb2.RequestContext
     room_id: str
     invite_token: str
-    def __init__(self, context: _Optional[_Union[_common_pb2.RequestContext, _Mapping]] = ..., room_id: _Optional[str] = ..., invite_token: _Optional[str] = ...) -> None: ...
+    idempotency_key: str
+    def __init__(self, context: _Optional[_Union[_common_pb2.RequestContext, _Mapping]] = ..., room_id: _Optional[str] = ..., invite_token: _Optional[str] = ..., idempotency_key: _Optional[str] = ...) -> None: ...
 
 class JoinRoomResponse(_message.Message):
     __slots__ = ("snapshot",)
@@ -188,12 +192,14 @@ class JoinRoomResponse(_message.Message):
     def __init__(self, snapshot: _Optional[_Union[RoomSnapshot, _Mapping]] = ...) -> None: ...
 
 class LeaveRoomRequest(_message.Message):
-    __slots__ = ("context", "room_id")
+    __slots__ = ("context", "room_id", "idempotency_key")
     CONTEXT_FIELD_NUMBER: _ClassVar[int]
     ROOM_ID_FIELD_NUMBER: _ClassVar[int]
+    IDEMPOTENCY_KEY_FIELD_NUMBER: _ClassVar[int]
     context: _common_pb2.RequestContext
     room_id: str
-    def __init__(self, context: _Optional[_Union[_common_pb2.RequestContext, _Mapping]] = ..., room_id: _Optional[str] = ...) -> None: ...
+    idempotency_key: str
+    def __init__(self, context: _Optional[_Union[_common_pb2.RequestContext, _Mapping]] = ..., room_id: _Optional[str] = ..., idempotency_key: _Optional[str] = ...) -> None: ...
 
 class LeaveRoomResponse(_message.Message):
     __slots__ = ("snapshot",)
@@ -202,12 +208,14 @@ class LeaveRoomResponse(_message.Message):
     def __init__(self, snapshot: _Optional[_Union[RoomSnapshot, _Mapping]] = ...) -> None: ...
 
 class CloseRoomRequest(_message.Message):
-    __slots__ = ("context", "room_id")
+    __slots__ = ("context", "room_id", "idempotency_key")
     CONTEXT_FIELD_NUMBER: _ClassVar[int]
     ROOM_ID_FIELD_NUMBER: _ClassVar[int]
+    IDEMPOTENCY_KEY_FIELD_NUMBER: _ClassVar[int]
     context: _common_pb2.RequestContext
     room_id: str
-    def __init__(self, context: _Optional[_Union[_common_pb2.RequestContext, _Mapping]] = ..., room_id: _Optional[str] = ...) -> None: ...
+    idempotency_key: str
+    def __init__(self, context: _Optional[_Union[_common_pb2.RequestContext, _Mapping]] = ..., room_id: _Optional[str] = ..., idempotency_key: _Optional[str] = ...) -> None: ...
 
 class CloseRoomResponse(_message.Message):
     __slots__ = ("snapshot",)
@@ -216,12 +224,14 @@ class CloseRoomResponse(_message.Message):
     def __init__(self, snapshot: _Optional[_Union[RoomSnapshot, _Mapping]] = ...) -> None: ...
 
 class MarkParticipantDisconnectedRequest(_message.Message):
-    __slots__ = ("context", "room_id")
+    __slots__ = ("context", "room_id", "idempotency_key")
     CONTEXT_FIELD_NUMBER: _ClassVar[int]
     ROOM_ID_FIELD_NUMBER: _ClassVar[int]
+    IDEMPOTENCY_KEY_FIELD_NUMBER: _ClassVar[int]
     context: _common_pb2.RequestContext
     room_id: str
-    def __init__(self, context: _Optional[_Union[_common_pb2.RequestContext, _Mapping]] = ..., room_id: _Optional[str] = ...) -> None: ...
+    idempotency_key: str
+    def __init__(self, context: _Optional[_Union[_common_pb2.RequestContext, _Mapping]] = ..., room_id: _Optional[str] = ..., idempotency_key: _Optional[str] = ...) -> None: ...
 
 class MarkParticipantDisconnectedResponse(_message.Message):
     __slots__ = ("snapshot",)

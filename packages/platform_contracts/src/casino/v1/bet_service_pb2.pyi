@@ -114,16 +114,18 @@ class BetSnapshot(_message.Message):
     def __init__(self, bet_id: _Optional[str] = ..., round_id: _Optional[str] = ..., player_id: _Optional[str] = ..., amount: _Optional[_Union[_common_pb2.Money, _Mapping]] = ..., selection: _Optional[_Union[BetSelection, _Mapping]] = ..., status: _Optional[_Union[BetStatus, str]] = ..., payout: _Optional[_Union[_common_pb2.Money, _Mapping]] = ..., wallet_reservation_id: _Optional[str] = ..., created_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., accepted_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., settled_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class PlaceBetRequest(_message.Message):
-    __slots__ = ("context", "round_id", "amount", "selection")
+    __slots__ = ("context", "round_id", "amount", "selection", "idempotency_key")
     CONTEXT_FIELD_NUMBER: _ClassVar[int]
     ROUND_ID_FIELD_NUMBER: _ClassVar[int]
     AMOUNT_FIELD_NUMBER: _ClassVar[int]
     SELECTION_FIELD_NUMBER: _ClassVar[int]
+    IDEMPOTENCY_KEY_FIELD_NUMBER: _ClassVar[int]
     context: _common_pb2.RequestContext
     round_id: str
     amount: _common_pb2.Money
     selection: BetSelection
-    def __init__(self, context: _Optional[_Union[_common_pb2.RequestContext, _Mapping]] = ..., round_id: _Optional[str] = ..., amount: _Optional[_Union[_common_pb2.Money, _Mapping]] = ..., selection: _Optional[_Union[BetSelection, _Mapping]] = ...) -> None: ...
+    idempotency_key: str
+    def __init__(self, context: _Optional[_Union[_common_pb2.RequestContext, _Mapping]] = ..., round_id: _Optional[str] = ..., amount: _Optional[_Union[_common_pb2.Money, _Mapping]] = ..., selection: _Optional[_Union[BetSelection, _Mapping]] = ..., idempotency_key: _Optional[str] = ...) -> None: ...
 
 class PlaceBetResponse(_message.Message):
     __slots__ = ("bet",)
@@ -132,12 +134,14 @@ class PlaceBetResponse(_message.Message):
     def __init__(self, bet: _Optional[_Union[BetSnapshot, _Mapping]] = ...) -> None: ...
 
 class CancelBetRequest(_message.Message):
-    __slots__ = ("context", "bet_id")
+    __slots__ = ("context", "bet_id", "idempotency_key")
     CONTEXT_FIELD_NUMBER: _ClassVar[int]
     BET_ID_FIELD_NUMBER: _ClassVar[int]
+    IDEMPOTENCY_KEY_FIELD_NUMBER: _ClassVar[int]
     context: _common_pb2.RequestContext
     bet_id: str
-    def __init__(self, context: _Optional[_Union[_common_pb2.RequestContext, _Mapping]] = ..., bet_id: _Optional[str] = ...) -> None: ...
+    idempotency_key: str
+    def __init__(self, context: _Optional[_Union[_common_pb2.RequestContext, _Mapping]] = ..., bet_id: _Optional[str] = ..., idempotency_key: _Optional[str] = ...) -> None: ...
 
 class CancelBetResponse(_message.Message):
     __slots__ = ("bet",)

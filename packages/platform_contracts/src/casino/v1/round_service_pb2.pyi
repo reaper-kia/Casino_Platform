@@ -186,24 +186,28 @@ class ThrowDiceAction(_message.Message):
     def __init__(self) -> None: ...
 
 class CashOutAction(_message.Message):
-    __slots__ = ()
-    def __init__(self) -> None: ...
+    __slots__ = ("bet_id",)
+    BET_ID_FIELD_NUMBER: _ClassVar[int]
+    bet_id: str
+    def __init__(self, bet_id: _Optional[str] = ...) -> None: ...
 
 class SubmitRoundActionRequest(_message.Message):
-    __slots__ = ("context", "round_id", "ready", "throw_dice", "cash_out", "expected_revision")
+    __slots__ = ("context", "round_id", "ready", "throw_dice", "cash_out", "expected_revision", "idempotency_key")
     CONTEXT_FIELD_NUMBER: _ClassVar[int]
     ROUND_ID_FIELD_NUMBER: _ClassVar[int]
     READY_FIELD_NUMBER: _ClassVar[int]
     THROW_DICE_FIELD_NUMBER: _ClassVar[int]
     CASH_OUT_FIELD_NUMBER: _ClassVar[int]
     EXPECTED_REVISION_FIELD_NUMBER: _ClassVar[int]
+    IDEMPOTENCY_KEY_FIELD_NUMBER: _ClassVar[int]
     context: _common_pb2.RequestContext
     round_id: str
     ready: ReadyAction
     throw_dice: ThrowDiceAction
     cash_out: CashOutAction
     expected_revision: int
-    def __init__(self, context: _Optional[_Union[_common_pb2.RequestContext, _Mapping]] = ..., round_id: _Optional[str] = ..., ready: _Optional[_Union[ReadyAction, _Mapping]] = ..., throw_dice: _Optional[_Union[ThrowDiceAction, _Mapping]] = ..., cash_out: _Optional[_Union[CashOutAction, _Mapping]] = ..., expected_revision: _Optional[int] = ...) -> None: ...
+    idempotency_key: str
+    def __init__(self, context: _Optional[_Union[_common_pb2.RequestContext, _Mapping]] = ..., round_id: _Optional[str] = ..., ready: _Optional[_Union[ReadyAction, _Mapping]] = ..., throw_dice: _Optional[_Union[ThrowDiceAction, _Mapping]] = ..., cash_out: _Optional[_Union[CashOutAction, _Mapping]] = ..., expected_revision: _Optional[int] = ..., idempotency_key: _Optional[str] = ...) -> None: ...
 
 class SubmitRoundActionResponse(_message.Message):
     __slots__ = ("snapshot",)

@@ -144,7 +144,9 @@ message ReadyAction {}
 message ThrowDiceAction {}
 
 
-message CashOutAction {}
+message CashOutAction {
+  string bet_id = 1;
+}
 
 
 message SubmitRoundActionRequest {
@@ -158,8 +160,8 @@ message SubmitRoundActionRequest {
   }
 
   uint64 expected_revision = 6;
+  string idempotency_key = 7;
 }
-
 
 message SubmitRoundActionResponse {
   RoundSnapshot snapshot = 1;

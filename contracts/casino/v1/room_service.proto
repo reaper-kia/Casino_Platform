@@ -99,6 +99,7 @@ message CreateRoomRequest {
   GameType game_type = 3;
   RoomVisibility visibility = 4;
   uint32 capacity = 5;
+  string idempotency_key = 6;
 }
 
 
@@ -139,6 +140,7 @@ message JoinRoomRequest {
   RequestContext context = 1;
   string room_id = 2;
   optional string invite_token = 3;
+  string idempotency_key = 4;
 }
 
 
@@ -150,6 +152,7 @@ message JoinRoomResponse {
 message LeaveRoomRequest {
   RequestContext context = 1;
   string room_id = 2;
+  string idempotency_key = 3;
 }
 
 
@@ -161,6 +164,7 @@ message LeaveRoomResponse {
 message CloseRoomRequest {
   RequestContext context = 1;
   string room_id = 2;
+  string idempotency_key = 3;
 }
 
 
@@ -172,6 +176,7 @@ message CloseRoomResponse {
 message MarkParticipantDisconnectedRequest {
   RequestContext context = 1;
   string room_id = 2;
+  string idempotency_key = 3;
 }
 
 
