@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package casino.v1;
+
+import "google/protobuf/timestamp.proto";
+
+
+message RequestContext {
+  string request_id = 1;
+  string actor_identity_user_id = 2;
+  repeated string permissions = 3;
+}
+
+
+message Money {
+  int64 amount_minor = 1;
+  string currency = 2;
+}
+
+
+enum GameType {
+  GAME_TYPE_UNSPECIFIED = 0;
+  GAME_TYPE_DICE_DUEL = 1;
+  GAME_TYPE_CRASH = 2;
+  GAME_TYPE_ROULETTE = 3;
+}
+
+
+enum CasinoPlayerStatus {
+  CASINO_PLAYER_STATUS_UNSPECIFIED = 0;
+  CASINO_PLAYER_STATUS_ACTIVE = 1;
+  CASINO_PLAYER_STATUS_BLOCKED = 2;
+}
+
+
+message CasinoPlayerSummary {
+  string player_id = 1;
+  string identity_user_id = 2;
+  optional string nickname = 3;
+  optional string avatar_url = 4;
+  CasinoPlayerStatus status = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}

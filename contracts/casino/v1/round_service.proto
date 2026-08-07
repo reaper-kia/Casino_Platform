@@ -1,0 +1,166 @@
+syntax = "proto3";
+
+package casino.v1;
+
+import "casino/v1/common.proto";
+import "google/protobuf/timestamp.proto";
+
+
+service CasinoRoundService {
+  rpc GetRound(GetRoundRequest) returns (GetRoundResponse);
+
+  rpc GetCurrentRound(GetCurrentRoundRequest)
+      returns (GetCurrentRoundResponse);
+
+  rpc ListRounds(ListRoundsRequest) returns (ListRoundsResponse);
+
+  rpc SubmitRoundAction(SubmitRoundActionRequest)
+      returns (SubmitRoundActionResponse);
+}
+
+
+enum RoundStatus {
+  ROUND_STATUS_UNSPECIFIED = 0;
+  ROUND_STATUS_SCHEDULED = 1;
+  ROUND_STATUS_BETTING = 2;
+  ROUND_STATUS_LOCKED = 3;
+  ROUND_STATUS_RUNNING = 4;
+  ROUND_STATUS_SETTLEMENT_PENDING = 5;
+  ROUND_STATUS_COMPLETED = 6;
+  ROUND_STATUS_CANCELLED = 7;
+}
+
+
+enum RouletteColor {
+  ROULETTE_COLOR_UNSPECIFIED = 0;
+  ROULETTE_COLOR_RED = 1;
+  ROULETTE_COLOR_BLACK = 2;
+  ROULETTE_COLOR_GREEN = 3;
+}
+
+
+message FairnessPublicData {
+  string server_seed_hash = 1;
+  optional string server_seed = 2;
+  string client_seed = 3;
+  uint64 nonce = 4;
+  string algorithm_version = 5;
+}
+
+
+message RoundSummary {
+  string round_id = 1;
+  string room_id = 2;
+  GameType game_type = 3;
+  uint64 round_number = 4;
+  RoundStatus status = 5;
+  uint64 revision = 6;
+  string configuration_version = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp betting_started_at = 9;
+  google.protobuf.Timestamp started_at = 10;
+  google.protobuf.Timestamp completed_at = 11;
+}
+
+
+message DiceRollResult {
+  string player_id = 1;
+  repeated uint32 values = 2;
+  uint32 total = 3;
+}
+
+
+message DiceDuelResult {
+  repeated DiceRollResult player_rolls = 1;
+  optional string winner_player_id = 2;
+}
+
+
+message CrashResult {
+  // 2000 означает коэффициент 2.000x.
+  uint64 crash_multiplier_millis = 1;
+}
+
+
+message RouletteResult {
+  // Строка позволяет в будущем поддержать как "0", так и "00".
+  string winning_pocket = 1;
+  RouletteColor color = 2;
+}
+
+
+message RoundSnapshot {
+  RoundSummary round = 1;
+  FairnessPublicData fairness = 2;
+
+  oneof result {
+    DiceDuelResult dice_duel_result = 20;
+    CrashResult crash_result = 21;
+    RouletteResult roulette_result = 22;
+  }
+}
+
+
+message GetRoundRequest {
+  RequestContext context = 1;
+  string round_id = 2;
+}
+
+
+message GetRoundResponse {
+  RoundSnapshot snapshot = 1;
+}
+
+
+message GetCurrentRoundRequest {
+  RequestContext context = 1;
+  string room_id = 2;
+}
+
+
+message GetCurrentRoundResponse {
+  RoundSnapshot snapshot = 1;
+}
+
+
+message ListRoundsRequest {
+  RequestContext context = 1;
+  string room_id = 2;
+  optional RoundStatus status = 3;
+  uint32 limit = 4;
+  string cursor = 5;
+}
+
+
+message ListRoundsResponse {
+  repeated RoundSummary rounds = 1;
+  string next_cursor = 2;
+}
+
+
+message ReadyAction {}
+
+
+message ThrowDiceAction {}
+
+
+message CashOutAction {}
+
+
+message SubmitRoundActionRequest {
+  RequestContext context = 1;
+  string round_id = 2;
+
+  oneof action {
+    ReadyAction ready = 3;
+    ThrowDiceAction throw_dice = 4;
+    CashOutAction cash_out = 5;
+  }
+
+  uint64 expected_revision = 6;
+}
+
+
+message SubmitRoundActionResponse {
+  RoundSnapshot snapshot = 1;
+}

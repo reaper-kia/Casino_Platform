@@ -1,0 +1,134 @@
+syntax = "proto3";
+
+package casino.v1;
+
+import "casino/v1/common.proto";
+import "google/protobuf/timestamp.proto";
+
+
+service CasinoBetService {
+  rpc PlaceBet(PlaceBetRequest) returns (PlaceBetResponse);
+  rpc CancelBet(CancelBetRequest) returns (CancelBetResponse);
+  rpc GetBet(GetBetRequest) returns (GetBetResponse);
+  rpc ListMyBets(ListMyBetsRequest) returns (ListMyBetsResponse);
+}
+
+
+enum BetStatus {
+  BET_STATUS_UNSPECIFIED = 0;
+  BET_STATUS_PENDING_RESERVATION = 1;
+  BET_STATUS_ACCEPTED = 2;
+  BET_STATUS_REJECTED = 3;
+  BET_STATUS_SETTLEMENT_PENDING = 4;
+  BET_STATUS_SETTLED = 5;
+  BET_STATUS_CANCELLED = 6;
+}
+
+
+enum RouletteBetType {
+  ROULETTE_BET_TYPE_UNSPECIFIED = 0;
+  ROULETTE_BET_TYPE_STRAIGHT = 1;
+  ROULETTE_BET_TYPE_SPLIT = 2;
+  ROULETTE_BET_TYPE_STREET = 3;
+  ROULETTE_BET_TYPE_CORNER = 4;
+  ROULETTE_BET_TYPE_LINE = 5;
+  ROULETTE_BET_TYPE_DOZEN = 6;
+  ROULETTE_BET_TYPE_COLUMN = 7;
+  ROULETTE_BET_TYPE_RED = 8;
+  ROULETTE_BET_TYPE_BLACK = 9;
+  ROULETTE_BET_TYPE_EVEN = 10;
+  ROULETTE_BET_TYPE_ODD = 11;
+  ROULETTE_BET_TYPE_LOW = 12;
+  ROULETTE_BET_TYPE_HIGH = 13;
+}
+
+
+message DiceDuelBetSelection {}
+
+
+message CrashBetSelection {
+  // 2000 означает автоматический cash out при 2.000x.
+  optional uint64 auto_cash_out_multiplier_millis = 1;
+}
+
+
+message RouletteBetSelection {
+  RouletteBetType bet_type = 1;
+
+  // Например: ["17"] для straight или ["17", "18"] для split.
+  repeated string pockets = 2;
+}
+
+
+message BetSelection {
+  oneof selection {
+    DiceDuelBetSelection dice_duel = 1;
+    CrashBetSelection crash = 2;
+    RouletteBetSelection roulette = 3;
+  }
+}
+
+
+message BetSnapshot {
+  string bet_id = 1;
+  string round_id = 2;
+  string player_id = 3;
+  Money amount = 4;
+  BetSelection selection = 5;
+  BetStatus status = 6;
+  Money payout = 7;
+  optional string wallet_reservation_id = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp accepted_at = 10;
+  google.protobuf.Timestamp settled_at = 11;
+}
+
+
+message PlaceBetRequest {
+  RequestContext context = 1;
+  string round_id = 2;
+  Money amount = 3;
+  BetSelection selection = 4;
+}
+
+
+message PlaceBetResponse {
+  BetSnapshot bet = 1;
+}
+
+
+message CancelBetRequest {
+  RequestContext context = 1;
+  string bet_id = 2;
+}
+
+
+message CancelBetResponse {
+  BetSnapshot bet = 1;
+}
+
+
+message GetBetRequest {
+  RequestContext context = 1;
+  string bet_id = 2;
+}
+
+
+message GetBetResponse {
+  BetSnapshot bet = 1;
+}
+
+
+message ListMyBetsRequest {
+  RequestContext context = 1;
+  optional string round_id = 2;
+  optional BetStatus status = 3;
+  uint32 limit = 4;
+  string cursor = 5;
+}
+
+
+message ListMyBetsResponse {
+  repeated BetSnapshot bets = 1;
+  string next_cursor = 2;
+}

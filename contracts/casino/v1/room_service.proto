@@ -1,0 +1,192 @@
+syntax = "proto3";
+
+package casino.v1;
+
+import "casino/v1/common.proto";
+import "google/protobuf/timestamp.proto";
+
+
+service CasinoRoomService {
+  rpc CreateRoom(CreateRoomRequest) returns (CreateRoomResponse);
+  rpc ListRooms(ListRoomsRequest) returns (ListRoomsResponse);
+
+  rpc GetRoomSnapshot(GetRoomSnapshotRequest)
+      returns (GetRoomSnapshotResponse);
+
+  rpc JoinRoom(JoinRoomRequest) returns (JoinRoomResponse);
+  rpc LeaveRoom(LeaveRoomRequest) returns (LeaveRoomResponse);
+  rpc CloseRoom(CloseRoomRequest) returns (CloseRoomResponse);
+
+  rpc MarkParticipantDisconnected(
+      MarkParticipantDisconnectedRequest
+  ) returns (MarkParticipantDisconnectedResponse);
+
+  rpc ResumeRoomSession(
+      ResumeRoomSessionRequest
+  ) returns (ResumeRoomSessionResponse);
+}
+
+
+enum RoomVisibility {
+  ROOM_VISIBILITY_UNSPECIFIED = 0;
+  ROOM_VISIBILITY_PUBLIC = 1;
+  ROOM_VISIBILITY_PRIVATE = 2;
+}
+
+
+enum RoomStatus {
+  ROOM_STATUS_UNSPECIFIED = 0;
+  ROOM_STATUS_OPEN = 1;
+  ROOM_STATUS_CLOSED = 2;
+  ROOM_STATUS_ARCHIVED = 3;
+}
+
+
+enum MembershipStatus {
+  MEMBERSHIP_STATUS_UNSPECIFIED = 0;
+  MEMBERSHIP_STATUS_ACTIVE = 1;
+  MEMBERSHIP_STATUS_LEFT = 2;
+}
+
+
+enum ConnectionStatus {
+  CONNECTION_STATUS_UNSPECIFIED = 0;
+  CONNECTION_STATUS_CONNECTED = 1;
+  CONNECTION_STATUS_DISCONNECTED = 2;
+}
+
+
+message RoomSummary {
+  string room_id = 1;
+  string name = 2;
+  GameType game_type = 3;
+  RoomVisibility visibility = 4;
+  RoomStatus status = 5;
+  uint32 capacity = 6;
+  uint32 participants_count = 7;
+  uint64 revision = 8;
+  optional string owner_player_id = 9;
+  bool is_system = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
+  google.protobuf.Timestamp closed_at = 13;
+}
+
+
+message RoomParticipantSnapshot {
+  string participant_id = 1;
+  CasinoPlayerSummary player = 2;
+  uint32 seat = 3;
+  MembershipStatus membership_status = 4;
+  ConnectionStatus connection_status = 5;
+  google.protobuf.Timestamp joined_at = 6;
+  google.protobuf.Timestamp disconnected_at = 7;
+  google.protobuf.Timestamp reconnect_deadline = 8;
+  google.protobuf.Timestamp left_at = 9;
+}
+
+
+message RoomSnapshot {
+  RoomSummary room = 1;
+  repeated RoomParticipantSnapshot participants = 2;
+  google.protobuf.Timestamp server_time = 3;
+}
+
+
+message CreateRoomRequest {
+  RequestContext context = 1;
+  string name = 2;
+  GameType game_type = 3;
+  RoomVisibility visibility = 4;
+  uint32 capacity = 5;
+}
+
+
+message CreateRoomResponse {
+  RoomSnapshot snapshot = 1;
+  optional string invite_token = 2;
+}
+
+
+message ListRoomsRequest {
+  RequestContext context = 1;
+  optional GameType game_type = 2;
+  optional RoomVisibility visibility = 3;
+  optional RoomStatus status = 4;
+  uint32 limit = 5;
+  string cursor = 6;
+}
+
+
+message ListRoomsResponse {
+  repeated RoomSummary rooms = 1;
+  string next_cursor = 2;
+}
+
+
+message GetRoomSnapshotRequest {
+  RequestContext context = 1;
+  string room_id = 2;
+}
+
+
+message GetRoomSnapshotResponse {
+  RoomSnapshot snapshot = 1;
+}
+
+
+message JoinRoomRequest {
+  RequestContext context = 1;
+  string room_id = 2;
+  optional string invite_token = 3;
+}
+
+
+message JoinRoomResponse {
+  RoomSnapshot snapshot = 1;
+}
+
+
+message LeaveRoomRequest {
+  RequestContext context = 1;
+  string room_id = 2;
+}
+
+
+message LeaveRoomResponse {
+  RoomSnapshot snapshot = 1;
+}
+
+
+message CloseRoomRequest {
+  RequestContext context = 1;
+  string room_id = 2;
+}
+
+
+message CloseRoomResponse {
+  RoomSnapshot snapshot = 1;
+}
+
+
+message MarkParticipantDisconnectedRequest {
+  RequestContext context = 1;
+  string room_id = 2;
+}
+
+
+message MarkParticipantDisconnectedResponse {
+  RoomSnapshot snapshot = 1;
+}
+
+
+message ResumeRoomSessionRequest {
+  RequestContext context = 1;
+  string room_id = 2;
+  uint64 last_revision = 3;
+}
+
+
+message ResumeRoomSessionResponse {
+  RoomSnapshot snapshot = 1;
+}

@@ -1,0 +1,217 @@
+syntax = "proto3";
+
+package wallet.v1;
+
+import "google/protobuf/timestamp.proto";
+
+
+service WalletService {
+  rpc GetWallet(GetWalletRequest) returns (GetWalletResponse);
+
+  rpc ListLedgerEntries(ListLedgerEntriesRequest)
+      returns (ListLedgerEntriesResponse);
+
+  rpc ReserveFunds(ReserveFundsRequest) returns (ReserveFundsResponse);
+  rpc SettleBet(SettleBetRequest) returns (SettleBetResponse);
+
+  rpc ReleaseReservation(ReleaseReservationRequest)
+      returns (ReleaseReservationResponse);
+
+  rpc CreditReward(CreditRewardRequest) returns (CreditRewardResponse);
+  rpc AdjustBalance(AdjustBalanceRequest) returns (AdjustBalanceResponse);
+}
+
+
+enum WalletStatus {
+  WALLET_STATUS_UNSPECIFIED = 0;
+  WALLET_STATUS_ACTIVE = 1;
+  WALLET_STATUS_FROZEN = 2;
+  WALLET_STATUS_CLOSED = 3;
+}
+
+
+enum ReservationStatus {
+  RESERVATION_STATUS_UNSPECIFIED = 0;
+  RESERVATION_STATUS_ACTIVE = 1;
+  RESERVATION_STATUS_SETTLED = 2;
+  RESERVATION_STATUS_RELEASED = 3;
+  RESERVATION_STATUS_EXPIRED = 4;
+}
+
+
+enum LedgerDirection {
+  LEDGER_DIRECTION_UNSPECIFIED = 0;
+  LEDGER_DIRECTION_CREDIT = 1;
+  LEDGER_DIRECTION_DEBIT = 2;
+}
+
+
+enum LedgerEntryType {
+  LEDGER_ENTRY_TYPE_UNSPECIFIED = 0;
+  LEDGER_ENTRY_TYPE_INITIAL_GRANT = 1;
+  LEDGER_ENTRY_TYPE_BET_SETTLEMENT = 2;
+  LEDGER_ENTRY_TYPE_BONUS = 3;
+  LEDGER_ENTRY_TYPE_ADMIN_ADJUSTMENT = 4;
+}
+
+
+message RequestContext {
+  // Идентификатор запроса для correlation/tracing, не финансовый ключ.
+  string request_id = 1;
+  string actor_identity_user_id = 2;
+  repeated string permissions = 3;
+}
+
+
+message Money {
+  // 1050 означает $10.50 для валюты USD.
+  int64 amount_minor = 1;
+  string currency = 2;
+}
+
+
+message WalletSnapshot {
+  string wallet_account_id = 1;
+  string identity_user_id = 2;
+  Money accounting_balance = 3;
+  Money reserved_amount = 4;
+  Money available_balance = 5;
+  WalletStatus status = 6;
+  uint64 version = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+
+message ReservationSnapshot {
+  string reservation_id = 1;
+  string wallet_account_id = 2;
+  string bet_id = 3;
+  Money amount = 4;
+  ReservationStatus status = 5;
+  google.protobuf.Timestamp expires_at = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp completed_at = 8;
+}
+
+
+message LedgerEntrySnapshot {
+  string ledger_entry_id = 1;
+  string wallet_account_id = 2;
+  string operation_id = 3;
+  LedgerEntryType entry_type = 4;
+  LedgerDirection direction = 5;
+  Money amount = 6;
+  Money balance_after = 7;
+  string reference_id = 8;
+  google.protobuf.Timestamp created_at = 9;
+}
+
+
+message GetWalletRequest {
+  RequestContext context = 1;
+  string identity_user_id = 2;
+}
+
+
+message GetWalletResponse {
+  WalletSnapshot wallet = 1;
+}
+
+
+message ListLedgerEntriesRequest {
+  RequestContext context = 1;
+  string identity_user_id = 2;
+  optional LedgerEntryType entry_type = 3;
+  optional LedgerDirection direction = 4;
+  uint32 limit = 5;
+  string cursor = 6;
+}
+
+
+message ListLedgerEntriesResponse {
+  repeated LedgerEntrySnapshot entries = 1;
+  string next_cursor = 2;
+}
+
+
+message ReserveFundsRequest {
+  RequestContext context = 1;
+
+  // Повтор с тем же ключом обязан вернуть прежний результат.
+  string idempotency_key = 2;
+  string identity_user_id = 3;
+  string bet_id = 4;
+  Money amount = 5;
+  google.protobuf.Timestamp expires_at = 6;
+}
+
+
+message ReserveFundsResponse {
+  ReservationSnapshot reservation = 1;
+  WalletSnapshot wallet = 2;
+}
+
+
+message SettleBetRequest {
+  RequestContext context = 1;
+  string idempotency_key = 2;
+  string reservation_id = 3;
+  string bet_id = 4;
+
+  // Для проигравшей ставки amount_minor равен 0.
+  Money payout = 5;
+}
+
+
+message SettleBetResponse {
+  ReservationSnapshot reservation = 1;
+  WalletSnapshot wallet = 2;
+  repeated LedgerEntrySnapshot ledger_entries = 3;
+}
+
+
+message ReleaseReservationRequest {
+  RequestContext context = 1;
+  string idempotency_key = 2;
+  string reservation_id = 3;
+  string bet_id = 4;
+  string reason = 5;
+}
+
+
+message ReleaseReservationResponse {
+  ReservationSnapshot reservation = 1;
+  WalletSnapshot wallet = 2;
+}
+
+
+message CreditRewardRequest {
+  RequestContext context = 1;
+  string idempotency_key = 2;
+  string identity_user_id = 3;
+  string reward_reference_id = 4;
+  Money amount = 5;
+}
+
+
+message CreditRewardResponse {
+  WalletSnapshot wallet = 1;
+  LedgerEntrySnapshot ledger_entry = 2;
+}
+
+
+message AdjustBalanceRequest {
+  RequestContext context = 1;
+  string idempotency_key = 2;
+  string identity_user_id = 3;
+  LedgerDirection direction = 4;
+  Money amount = 5;
+  string reason = 6;
+}
+
+
+message AdjustBalanceResponse {
+  WalletSnapshot wallet = 1;
+  LedgerEntrySnapshot ledger_entry = 2;
+}
