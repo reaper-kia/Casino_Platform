@@ -62,10 +62,7 @@ class Room:
         if not self.is_system and self.owner_player_id is None:
             raise ValueError("Player-created room must have an owner")
 
-        if (
-            self.visibility is RoomVisibility.PRIVATE
-            and self.invite_token_hash is None
-        ):
+        if self.visibility is RoomVisibility.PRIVATE and self.invite_token_hash is None:
             raise ValueError("Private room must have an invite token hash")
 
     def close(self) -> None:
@@ -112,10 +109,7 @@ class RoomParticipant:
         if self.membership_status is not MembershipStatus.ACTIVE:
             raise ValueError("Participant has already left")
 
-        if (
-            self.reconnect_deadline is not None
-            and current_time > self.reconnect_deadline
-        ):
+        if self.reconnect_deadline is not None and current_time > self.reconnect_deadline:
             raise ValueError("Reconnect grace period expired")
 
         self.connection_status = ConnectionStatus.CONNECTED

@@ -3,7 +3,6 @@ from pathlib import Path
 import grpc_tools
 from grpc_tools import protoc
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CONTRACTS_DIR = PROJECT_ROOT / "contracts"
 OUTPUT_DIR = PROJECT_ROOT / "packages" / "platform_contracts" / "src"
