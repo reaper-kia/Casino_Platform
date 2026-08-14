@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from typing import Any, Optional
 from uuid import UUID, uuid4
 
 from casino_service.domain.enums import (
@@ -188,14 +189,13 @@ class RoundAction:
     created_at: datetime = field(default_factory=utc_now)
 
 
-@dataclass(slots=True, kw_only=True)
 class ProcessedCommand:
-    request_id: str
-    request_hash: str
+    actor_identity_user_id: UUID
     command_name: str
+    idempotency_key: str
+    request_hash: str
 
     id: UUID = field(default_factory=uuid4)
-    event_id: UUID | None = None
-    response_payload: dict[str, object] = field(default_factory=dict)
-    error_code: str | None = None
-    completed_at: datetime = field(default_factory=utc_now)
+    response_payload: dict[str, Any] = field(default_factory=dict)
+    error_code: Optional[str] = None
+    completed_at: datetime = field(default_factory=lambda: datetime.now(UTC))

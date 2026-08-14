@@ -6,6 +6,8 @@ WORKDIR /app/services/casino_service
 
 COPY packages/platform_contracts /app/packages/platform_contracts
 COPY services/casino_service/pyproject.toml services/casino_service/uv.lock services/casino_service/README.md ./
+COPY services/casino_service/alembic.ini ./alembic.ini
+COPY services/casino_service/alembic ./alembic
 
 RUN uv sync --locked --no-dev --no-install-project
 

@@ -1060,7 +1060,7 @@ Retry использует exponential backoff с jitter.
 | Gateway → Identity query | 2 секунды |
 | Gateway → Wallet query | 2 секунды |
 | Gateway → Casino query | 2 секунды |
-| Gateway → Casino command | 3 секунды |
+| Gateway → Casino command | 3 секунды |Л
 | Casino → Wallet financial command | 3 секунды |
 
 Входящий deadline должен учитываться при создании исходящего вызова.

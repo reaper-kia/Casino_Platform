@@ -29,11 +29,14 @@ services:
     build:
       context: .
       dockerfile: services/casino_service/Dockerfile
-    environment:
-      DATABASE_URL: postgresql+asyncpg://casino:${CASINO_DB_PASSWORD:-casino_local}@casino_db:5432/casino
-      REDIS_URL: redis://redis:6379/0
+    env_file:
+      - ./services/casino_service/.env
     ports:
       - "50051:50051"
+    volumes:
+      - ./services/casino_service/src:/app/services/casino_service/src
+      - ./services/casino_service/alembic:/app/services/casino_service/alembic
+      - ./services/casino_service/alembic.ini:/app/services/casino_service/alembic.ini
     depends_on:
       casino_db:
         condition: service_healthy
