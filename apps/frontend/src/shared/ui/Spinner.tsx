@@ -11,7 +11,7 @@ export function Spinner({ size = 'md', className = '' }: SpinnerProps) {
   };
 
   return (
-    <div className="flex justify-center items-center py-8">
+    <div className="flex justify-center items-center py-8" role="status" aria-label="Загрузка">
       <svg
         className={`animate-spin text-accent ${sizes[size]} ${className}`}
         fill="none"
