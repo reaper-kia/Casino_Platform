@@ -5,6 +5,7 @@ class GameType(StrEnum):
     DICE_DUEL = "dice_duel"
     CRASH = "crash"
     ROULETTE = "roulette"
+    POKER = "poker"
 
 
 class CasinoPlayerStatus(StrEnum):

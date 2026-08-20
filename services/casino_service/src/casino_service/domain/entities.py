@@ -84,6 +84,28 @@ class Room:
     def is_full(self, active_participants: int) -> bool:
         return active_participants >= self.capacity
 
+    @staticmethod
+    def create(
+        owner_id: UUID,
+        game_type: str,
+        visibility: str,
+        token_hash: Optional[str],
+        max_players: int,
+    ) -> "Room":
+        game_type_enum = GameType(game_type)
+        visibility_enum = RoomVisibility(visibility)
+        
+        name = f"Room_{uuid4().hex[:8]}"
+        
+        return Room(
+            name=name,
+            game_type=game_type_enum,
+            visibility=visibility_enum,
+            capacity=max_players,
+            owner_player_id=owner_id,
+            invite_token_hash=token_hash,
+        )
+
 
 @dataclass(slots=True, kw_only=True)
 class RoomParticipant:
@@ -189,13 +211,9 @@ class RoundAction:
     created_at: datetime = field(default_factory=utc_now)
 
 
+@dataclass(slots=True, kw_only=True)
 class ProcessedCommand:
-    actor_identity_user_id: UUID
-    command_name: str
-    idempotency_key: str
-    request_hash: str
-
-    id: UUID = field(default_factory=uuid4)
-    response_payload: dict[str, Any] = field(default_factory=dict)
-    error_code: Optional[str] = None
-    completed_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    key: UUID
+    payload_hash: str
+    result_room_id: UUID
+    created_at: datetime = field(default_factory=utc_now)
