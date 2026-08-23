@@ -264,3 +264,11 @@ class RoomParticipantModel(Base):
             postgresql_where=(membership_status == MembershipStatus.ACTIVE),
         ),
     )
+
+class ProcessedCommandModel(Base):
+    __tablename__ = "processed_commands"
+
+    key: Mapped[UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid4)
+    payload_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    result_room_id: Mapped[UUID] = mapped_column(PG_UUID(as_uuid=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
