@@ -39,7 +39,7 @@ jobs:
         run: uv run mypy src
    
       - name: tests
-        run: uv run pytest || true
+        run: uv run pytest
   
   contracts:
     runs-on: ubuntu-latest

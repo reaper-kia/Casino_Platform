@@ -18,3 +18,5 @@ frontend/dist
 dist
 build
 *.log
+
+infra/ansible/inventory/group_vars/**/secrets.yml
