@@ -1,6 +1,5 @@
-import type { RoomSummaryDto } from './types';
+import type { ParticipantDto, RoomSnapshotDto, RoomSummaryDto } from './types';
 
-// Mock возвращает ТОТ ЖЕ DTO, что и реальный Gateway.
 export const mockRooms: RoomSummaryDto[] = [
   {
     room_id: 'room-1',
@@ -8,7 +7,7 @@ export const mockRooms: RoomSummaryDto[] = [
     game_type: 'crash',
     visibility: 'public',
     status: 'open',
-    participants_count: 45,
+    participants_count: 3,
     capacity: 100,
     revision: 3,
     owner_player_id: null,
@@ -23,7 +22,7 @@ export const mockRooms: RoomSummaryDto[] = [
     game_type: 'roulette',
     visibility: 'public',
     status: 'open',
-    participants_count: 12,
+    participants_count: 2,
     capacity: 50,
     revision: 1,
     owner_player_id: null,
@@ -53,7 +52,7 @@ export const mockRooms: RoomSummaryDto[] = [
     game_type: 'crash',
     visibility: 'private',
     status: 'open',
-    participants_count: 8,
+    participants_count: 1,
     capacity: 20,
     revision: 2,
     owner_player_id: 'player-7',
@@ -93,3 +92,56 @@ export const mockRooms: RoomSummaryDto[] = [
     closed_at: '2026-08-21T12:00:00Z',
   },
 ];
+
+const mockParticipantsByRoom: Record<string, ParticipantDto[]> = {
+  'room-1': [
+    {
+      seat: 1,
+      connection_status: 'online',
+      player: { player_id: 'player-7', nickname: 'Alice', avatar_url: null },
+    },
+    {
+      seat: 2,
+      connection_status: 'idle',
+      player: { player_id: 'player-42', nickname: 'Bob', avatar_url: null },
+    },
+    {
+      seat: 3,
+      connection_status: 'online',
+      player: { player_id: 'player-99', nickname: 'Charlie', avatar_url: null },
+    },
+  ],
+  'room-2': [
+    {
+      seat: 1,
+      connection_status: 'online',
+      player: { player_id: 'player-11', nickname: 'Dana', avatar_url: null },
+    },
+    {
+      seat: 5,
+      connection_status: 'disconnected',
+      player: { player_id: 'player-22', nickname: 'Eve', avatar_url: null },
+    },
+  ],
+  'room-4': [
+    {
+      seat: 1,
+      connection_status: 'online',
+      player: { player_id: 'player-7', nickname: 'Owner', avatar_url: null },
+    },
+  ],
+  // room-3, room-5, room-6 — закрытые/архивированные, список пустой
+};
+
+/**
+ * Mock snapshot для конкретной комнаты.
+ * Возвращает null, если комнаты нет в каталоге.
+ */
+export function getMockSnapshot(roomId: string): RoomSnapshotDto | null {
+  const room = mockRooms.find((r) => r.room_id === roomId);
+  if (!room) return null;
+  return {
+    ...room,
+    participants: mockParticipantsByRoom[roomId] ?? [],
+  };
+}

@@ -112,27 +112,6 @@ describe('CasinoLobbyPage', () => {
     expect(roomLink).toHaveAttribute('href', '/casino/rooms/room-1');
   });
 
-  it('пагинация подгружает следующую страницу', async () => {
-    const user = userEvent.setup();
-    render(<CasinoLobbyPage />, { wrapper });
-
-    // Первая страница: 4 комнаты (DEFAULT_PAGE_SIZE = 4)
-    await waitFor(() => {
-      expect(screen.getAllByRole('link')).toHaveLength(4);
-    });
-
-    const moreButton = screen.getByRole('button', { name: /Загрузить ещё/i });
-    await user.click(moreButton);
-
-    // После догрузки: все 6 комнат, кнопка исчезает
-    await waitFor(() => {
-      expect(screen.getAllByRole('link')).toHaveLength(6);
-    });
-    expect(
-      screen.queryByRole('button', { name: /Загрузить ещё/i }),
-    ).not.toBeInTheDocument();
-  });
-
   it('ошибка Gateway показывает ErrorState и кнопку retry', async () => {
     vi.stubEnv('VITE_API_MODE', 'real');
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeGatewayErrorResponse()));
@@ -145,5 +124,48 @@ describe('CasinoLobbyPage', () => {
     expect(
       screen.getByRole('button', { name: /Попробовать снова/i }),
     ).toBeInTheDocument();
+  });
+
+  it('пагинация: вторая страница добавляется к первой без дубликатов, кнопка исчезает в конце', async () => {
+    const user = userEvent.setup();
+    render(<CasinoLobbyPage />, { wrapper });
+
+    // 1. Загрузилась первая страница (4 комнаты при DEFAULT_PAGE_SIZE = 4)
+    await waitFor(() => {
+      expect(screen.getByText('Crash VIP')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Roulette Classic')).toBeInTheDocument();
+    expect(screen.getByText('Dice Duel Pro')).toBeInTheDocument();
+    expect(screen.getByText('Private Crash')).toBeInTheDocument();
+
+    // Второй страницы ещё нет
+    expect(screen.queryByText('Roulette Tournament')).not.toBeInTheDocument();
+    expect(screen.queryByText('Private Dice Club')).not.toBeInTheDocument();
+
+    // 2. Кнопка «Загрузить ещё» видна и нажата
+    const moreButton = screen.getByRole('button', { name: /Загрузить ещё/i });
+    await user.click(moreButton);
+
+    // 3. Появились элементы второй страницы
+    await waitFor(() => {
+      expect(screen.getByText('Roulette Tournament')).toBeInTheDocument();
+      expect(screen.getByText('Private Dice Club')).toBeInTheDocument();
+    });
+
+    // 4. Старые элементы сохранились
+    expect(screen.getByText('Crash VIP')).toBeInTheDocument();
+    expect(screen.getByText('Roulette Classic')).toBeInTheDocument();
+    expect(screen.getByText('Dice Duel Pro')).toBeInTheDocument();
+    expect(screen.getByText('Private Crash')).toBeInTheDocument();
+
+    // 5. Дубликатов нет: каждая комната ровно один раз, всего 6 карточек-ссылок
+    expect(screen.getAllByText('Crash VIP')).toHaveLength(1);
+    expect(screen.getAllByText('Roulette Tournament')).toHaveLength(1);
+    expect(screen.getAllByRole('link')).toHaveLength(6);
+
+    // 6. После последней страницы кнопка исчезла
+    expect(
+      screen.queryByRole('button', { name: /Загрузить ещё/i }),
+    ).not.toBeInTheDocument();
   });
 });

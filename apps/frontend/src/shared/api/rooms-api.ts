@@ -1,8 +1,9 @@
 import { env } from '../config/env';
-import { api } from './client';
-import { mockRooms } from './mock-data';
+import { ApiError, api } from './client';
+import { getMockSnapshot, mockRooms } from './mock-data';
 import type {
   GameType,
+  RoomSnapshotDto,
   RoomStatus,
   RoomVisibility,
   RoomsResponseDto,
@@ -40,7 +41,6 @@ function parseCursor(cursor: string | undefined): number {
 async function fetchRoomsMock(
   params: FetchRoomsParams,
 ): Promise<RoomsResponseDto> {
-  // Имитация сетевой задержки, чтобы loading-состояния были видимыми
   await new Promise((resolve) => setTimeout(resolve, 300));
 
   const filtered = mockRooms.filter((room) => {
@@ -75,4 +75,32 @@ async function fetchRoomsReal(
   return api.get<RoomsResponseDto>(`/casino/rooms${query ? `?${query}` : ''}`, {
     signal: params.signal,
   });
+}
+
+export interface FetchRoomSnapshotParams {
+  roomId: string;
+  signal?: AbortSignal;
+}
+
+export async function fetchRoomSnapshot(
+  params: FetchRoomSnapshotParams,
+): Promise<RoomSnapshotDto> {
+  if (env.apiMode === 'mock') {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    const snap = getMockSnapshot(params.roomId);
+    if (!snap) {
+      throw new ApiError(
+        'ROOM_NOT_FOUND',
+        `Комната ${params.roomId} не найдена`,
+        undefined,
+        [],
+        404,
+      );
+    }
+    return snap;
+  }
+  return api.get<RoomSnapshotDto>(
+    `/casino/rooms/${encodeURIComponent(params.roomId)}`,
+    { signal: params.signal },
+  );
 }
