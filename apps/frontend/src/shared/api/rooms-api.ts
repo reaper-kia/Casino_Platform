@@ -1,50 +1,69 @@
 import { env } from '../config/env';
 import { api } from './client';
 import { mockRooms } from './mock-data';
-import type { RoomsResponseDto, GameType, RoomVisibility, RoomStatus } from './types';
+import type {
+  GameType,
+  RoomStatus,
+  RoomVisibility,
+  RoomsResponseDto,
+} from './types';
+
+export const DEFAULT_PAGE_SIZE = 4;
 
 export interface RoomsFilters {
   gameType?: GameType;
   visibility?: RoomVisibility;
   status?: RoomStatus;
   limit?: number;
-  cursor?: string;
 }
 
 export interface FetchRoomsParams extends RoomsFilters {
+  cursor?: string;
   signal?: AbortSignal;
 }
 
 export async function fetchRooms(
   params: FetchRoomsParams = {},
 ): Promise<RoomsResponseDto> {
-  // Mock режим включается явно через VITE_API_MODE=mock
   if (env.apiMode === 'mock') {
-    await new Promise((resolve) => setTimeout(resolve, 500)); // Имитация задержки
-    
-    let filtered = [...mockRooms];
-    
-    if (params.gameType) {
-      filtered = filtered.filter((r) => r.game_type === params.gameType);
-    }
-    if (params.visibility) {
-      filtered = filtered.filter((r) => r.visibility === params.visibility);
-    }
-    if (params.status) {
-      filtered = filtered.filter((r) => r.status === params.status);
-    }
-    
-    const limit = params.limit ?? 10;
-    const paginated = filtered.slice(0, limit);
-    
-    return {
-      rooms: paginated,
-      total: filtered.length,
-      next_cursor: filtered.length > limit ? 'cursor-next' : undefined,
-    };
+    return fetchRoomsMock(params);
   }
+  return fetchRoomsReal(params);
+}
 
-  // Реальный API
+function parseCursor(cursor: string | undefined): number {
+  if (!cursor) return 0;
+  const parsed = Number.parseInt(cursor, 10);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+}
+
+async function fetchRoomsMock(
+  params: FetchRoomsParams,
+): Promise<RoomsResponseDto> {
+  // Имитация сетевой задержки, чтобы loading-состояния были видимыми
+  await new Promise((resolve) => setTimeout(resolve, 300));
+
+  const filtered = mockRooms.filter((room) => {
+    if (params.gameType && room.game_type !== params.gameType) return false;
+    if (params.visibility && room.visibility !== params.visibility) return false;
+    if (params.status && room.status !== params.status) return false;
+    return true;
+  });
+
+  const limit = params.limit ?? DEFAULT_PAGE_SIZE;
+  const offset = parseCursor(params.cursor);
+  const items = filtered.slice(offset, offset + limit);
+  const nextOffset = offset + limit;
+
+  return {
+    items,
+    next_cursor: nextOffset < filtered.length ? String(nextOffset) : null,
+  };
+}
+
+async function fetchRoomsReal(
+  params: FetchRoomsParams,
+): Promise<RoomsResponseDto> {
   const searchParams = new URLSearchParams();
   if (params.gameType) searchParams.set('game_type', params.gameType);
   if (params.visibility) searchParams.set('visibility', params.visibility);
@@ -53,7 +72,7 @@ export async function fetchRooms(
   if (params.cursor) searchParams.set('cursor', params.cursor);
 
   const query = searchParams.toString();
-  const path = `/casino/rooms${query ? `?${query}` : ''}`;
-  
-  return api.get<RoomsResponseDto>(path, { signal: params.signal });
+  return api.get<RoomsResponseDto>(`/casino/rooms${query ? `?${query}` : ''}`, {
+    signal: params.signal,
+  });
 }

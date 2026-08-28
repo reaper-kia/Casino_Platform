@@ -20,7 +20,16 @@ export function CasinoLobbyPage() {
     status: status || undefined,
   };
 
-  const { data, isLoading, isError, error, refetch } = useRooms(filters);
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useRooms(filters);
 
   const resetFilters = () => {
     setGameType('');
@@ -29,13 +38,12 @@ export function CasinoLobbyPage() {
   };
 
   const rooms = data?.rooms ?? [];
-  const hasMore = data?.nextCursor;
 
   return (
     <div>
       <h1 className="text-3xl font-bold text-text-primary mb-6">Казино Лобби</h1>
 
-      {/* Фильтры — видны всегда, не исчезают при перезагрузке */}
+      {/* Фильтры — видны всегда */}
       <div className="bg-surface border border-border rounded-xl p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
@@ -84,7 +92,7 @@ export function CasinoLobbyPage() {
               <option value="">Все</option>
               <option value="open">Open</option>
               <option value="closed">Closed</option>
-              <option value="in_progress">In Progress</option>
+              <option value="archived">Archived</option>
             </select>
           </div>
 
@@ -118,7 +126,7 @@ export function CasinoLobbyPage() {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
             {rooms.map((room) => (
-              <Link key={room.id} to={`/casino/rooms/${room.id}`}>
+              <Link key={room.roomId} to={`/casino/rooms/${room.roomId}`}>
                 <Card className="hover:bg-surface-elevated transition-colors cursor-pointer h-full">
                   <div className="flex items-start justify-between mb-4">
                     <div>
@@ -139,7 +147,7 @@ export function CasinoLobbyPage() {
                             : 'warning'
                         }
                       >
-                        {room.status.replace('_', ' ')}
+                        {room.status}
                       </StatusBadge>
                       {room.visibility === 'private' && (
                         <StatusBadge status="info">Private</StatusBadge>
@@ -154,21 +162,22 @@ export function CasinoLobbyPage() {
                         {room.participantsCount} / {room.capacity}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Ставки:</span>
-                      <span className="text-text-primary font-medium">
-                        ${room.minBet} - ${room.maxBet}
-                      </span>
-                    </div>
                   </div>
                 </Card>
               </Link>
             ))}
           </div>
 
-          {hasMore && (
+          {hasNextPage && (
             <div className="flex justify-center">
-              <Button variant="secondary">Загрузить ещё</Button>
+              <Button
+                variant="secondary"
+                onClick={() => fetchNextPage()}
+                loading={isFetchingNextPage}
+                disabled={isFetchingNextPage}
+              >
+                Загрузить ещё
+              </Button>
             </div>
           )}
         </>

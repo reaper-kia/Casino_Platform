@@ -1,31 +1,43 @@
-import type { RoomSummaryDto, GameType, RoomVisibility, RoomStatus } from './types';
+import type {
+  GameType,
+  RoomStatus,
+  RoomSummaryDto,
+  RoomVisibility,
+} from './types';
 
-// UI модель с удобными именами (camelCase)
+// UI-модель комнаты: удобные для React имена (camelCase).
+// НЕ смешиваем с DTO.
 export interface RoomSummary {
-  id: string;
+  roomId: string;
   name: string;
   gameType: GameType;
   visibility: RoomVisibility;
   status: RoomStatus;
   participantsCount: number;
   capacity: number;
-  minBet: number;
-  maxBet: number;
-  createdAt: Date;
+  revision: number;
+  ownerPlayerId: string | null;
+  isSystem: boolean;
+  createdAt: string;
+  updatedAt: string;
+  closedAt: string | null;
 }
 
-// Mapper: API DTO → UI модель
+// Mapper: RoomSummaryDto -> RoomSummary
 export function mapRoomSummary(dto: RoomSummaryDto): RoomSummary {
   return {
-    id: dto.id,
+    roomId: dto.room_id,
     name: dto.name,
     gameType: dto.game_type,
     visibility: dto.visibility,
     status: dto.status,
     participantsCount: dto.participants_count,
     capacity: dto.capacity,
-    minBet: dto.min_bet,
-    maxBet: dto.max_bet,
-    createdAt: new Date(dto.created_at),
+    revision: dto.revision,
+    ownerPlayerId: dto.owner_player_id,
+    isSystem: dto.is_system,
+    createdAt: dto.created_at,
+    updatedAt: dto.updated_at,
+    closedAt: dto.closed_at,
   };
 }

@@ -1,15 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
-import { fetchRooms, type RoomsFilters } from '../../../shared/api/rooms-api';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { mapRoomSummary } from '../../../shared/api/models';
+import { fetchRooms, type RoomsFilters } from '../../../shared/api/rooms-api';
 
 export function useRooms(filters: RoomsFilters = {}) {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ['rooms', filters],
-    queryFn: ({ signal }) => fetchRooms({ ...filters, signal }),
+    initialPageParam: null as string | null,
+    queryFn: ({ pageParam, signal }) =>
+      fetchRooms({ ...filters, cursor: pageParam ?? undefined, signal }),
+    getNextPageParam: (lastPage) => lastPage.next_cursor ?? undefined,
     select: (data) => ({
-      rooms: data.rooms.map(mapRoomSummary),
-      nextCursor: data.next_cursor,
-      total: data.total,
+      rooms: data.pages.flatMap((page) => page.items).map(mapRoomSummary),
     }),
   });
 }
