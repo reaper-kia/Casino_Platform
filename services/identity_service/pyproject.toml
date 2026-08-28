@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "alembic>=1.16.0",
+    "argon2-cffi>=25.1.0",
     "asyncpg>=0.30.0",
     "casino-platform-contracts",
     "grpcio>=1.83.0",

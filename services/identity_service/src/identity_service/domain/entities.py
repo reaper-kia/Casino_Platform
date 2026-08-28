@@ -3,6 +3,8 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from uuid import UUID, uuid4
 
+from identity_service.domain.value_objects import Email, Nickname
+
 
 def utc_now() -> datetime:
     return datetime.now(UTC)
@@ -21,8 +23,8 @@ class UserStatus(StrEnum):
 
 @dataclass(slots=True, kw_only=True)
 class User:
-    email: str
-    nickname: str
+    email: Email
+    nickname: Nickname
     password_hash: str
 
     id: UUID = field(default_factory=uuid4)
@@ -32,6 +34,29 @@ class User:
     created_at: datetime = field(default_factory=utc_now)
     updated_at: datetime = field(default_factory=utc_now)
     password_changed_at: datetime = field(default_factory=utc_now)
+
+    @classmethod
+    def register(cls, email: Email, nickname: Nickname, password_hash: str) -> "User":
+        return cls(
+            email=email,
+            nickname=nickname,
+            password_hash=password_hash,
+        )
+
+    def change_role(self, role: UserRole) -> None:
+        if self.role == role:
+            return
+        self.role = role
+
+    def change_email(self, email: Email) -> None:
+        if self.email == email:
+            return
+        self.email = email
+
+    def change_nickname(self, nickname: Nickname) -> None:
+        if self.nickname == nickname:
+            return
+        self.nickname = nickname
 
     def change_password(self, password_hash: str, algorithm: str) -> None:
         self.password_hash = password_hash
@@ -56,10 +81,23 @@ class RefreshSession:
     ip_address: str | None = None
     user_agent: str | None = None
 
-    @property
-    def is_active(self) -> bool:
-        return self.revoked_at is None and self.expires_at > utc_now()
+    family_id: UUID = field(default_factory=uuid4)
+    replaced_by_session_id: UUID | None = None
 
     def revoke(self) -> None:
-        if self.revoked_at is None:
-            self.revoked_at = utc_now()
+        if self.revoked_at is not None:
+            return
+
+        self.revoked_at = utc_now()
+
+    def replace_with(self, replacement_id: UUID) -> None:
+        if self.revoked_at is not None:
+            return
+
+        self.revoked_at = utc_now()
+        self.replaced_by_session_id = replacement_id
+
+    def is_active(self, now: datetime | None = None) -> bool:
+        current_time = now or utc_now()
+
+        return self.revoked_at is None and self.expires_at > current_time
