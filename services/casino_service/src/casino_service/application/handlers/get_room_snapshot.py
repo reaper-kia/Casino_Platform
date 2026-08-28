@@ -1,8 +1,9 @@
-from datetime import datetime, UTC
-from ..queries.get_room_snapshot import GetRoomSnapshotQuery
-from ..ports.room_repository import RoomReadRepository
-from ..read_models import RoomSnapshot
-from ...domain.exceptions import RoomNotFoundError
+from datetime import UTC, datetime
+
+from casino_service.application.ports.room_read_repository import RoomReadRepository
+from casino_service.application.queries.get_room_snapshot import GetRoomSnapshotQuery
+from casino_service.application.read_models import RoomSnapshot
+from casino_service.domain.exceptions import RoomNotFoundError
 
 
 class GetRoomSnapshotHandler:
@@ -13,8 +14,5 @@ class GetRoomSnapshotHandler:
         snapshot = await self._read_repo.get_snapshot(query.room_id)
         if snapshot is None:
             raise RoomNotFoundError(f"Room {query.room_id} not found")
-        return RoomSnapshot(
-            room=snapshot.room,
-            participants=snapshot.participants,
-            server_time=datetime.now(UTC),
-        )
+        snapshot.server_time = datetime.now(UTC)
+        return snapshot

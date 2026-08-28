@@ -1,9 +1,15 @@
 from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
-from typing import List, Optional
 
-from src.casino_service.domain.enums import CasinoPlayerStatus, ConnectionStatus, GameType, MembershipStatus, RoomStatus, RoomVisibility
+from casino_service.domain.enums import (
+    CasinoPlayerStatus,
+    ConnectionStatus,
+    GameType,
+    MembershipStatus,
+    RoomStatus,
+    RoomVisibility,
+)
 
 
 @dataclass(frozen=True)
@@ -46,15 +52,13 @@ class RoomReadModel:
     status: RoomStatus
     is_system: bool
     revision: int
-    invite_token_hash: str | None
     created_at: datetime
     updated_at: datetime
     closed_at: datetime | None
 
 
-@dataclass(frozen=True)
+@dataclass
 class RoomSnapshot:
-    """Полный снимок комнаты для GetRoomSnapshot."""
     room: RoomReadModel
-    participants: List[ParticipantReadModel]
-    server_time: datetime   # заполняется в хэндлере
+    participants: list[ParticipantReadModel]
+    server_time: datetime

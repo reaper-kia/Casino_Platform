@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from typing import Any, Optional
 from uuid import UUID, uuid4
 
 from casino_service.domain.enums import (
@@ -63,10 +62,7 @@ class Room:
         if not self.is_system and self.owner_player_id is None:
             raise ValueError("Player-created room must have an owner")
 
-        if (
-            self.visibility is RoomVisibility.PRIVATE
-            and self.invite_token_hash is None
-        ):
+        if self.visibility is RoomVisibility.PRIVATE and self.invite_token_hash is None:
             raise ValueError("Private room must have an invite token hash")
 
     def close(self) -> None:
@@ -86,22 +82,18 @@ class Room:
 
     @staticmethod
     def create(
+        name: str,
         owner_id: UUID,
-        game_type: str,
-        visibility: str,
-        token_hash: Optional[str],
-        max_players: int,
+        game_type: GameType,
+        visibility: RoomVisibility,
+        token_hash: str | None,
+        capacity: int,
     ) -> "Room":
-        game_type_enum = GameType(game_type)
-        visibility_enum = RoomVisibility(visibility)
-        
-        name = f"Room_{uuid4().hex[:8]}"
-        
         return Room(
             name=name,
-            game_type=game_type_enum,
-            visibility=visibility_enum,
-            capacity=max_players,
+            game_type=game_type,
+            visibility=visibility,
+            capacity=capacity,
             owner_player_id=owner_id,
             invite_token_hash=token_hash,
         )
@@ -135,10 +127,7 @@ class RoomParticipant:
         if self.membership_status is not MembershipStatus.ACTIVE:
             raise ValueError("Participant has already left")
 
-        if (
-            self.reconnect_deadline is not None
-            and current_time > self.reconnect_deadline
-        ):
+        if self.reconnect_deadline is not None and current_time > self.reconnect_deadline:
             raise ValueError("Reconnect grace period expired")
 
         self.connection_status = ConnectionStatus.CONNECTED
@@ -214,6 +203,8 @@ class RoundAction:
 @dataclass(slots=True, kw_only=True)
 class ProcessedCommand:
     key: UUID
+    actor_identity_user_id: UUID
+    command_name: str
     payload_hash: str
     result_room_id: UUID
     created_at: datetime = field(default_factory=utc_now)

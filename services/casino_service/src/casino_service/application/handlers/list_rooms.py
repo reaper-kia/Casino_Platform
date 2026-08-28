@@ -1,14 +1,14 @@
-from typing import Tuple, List, Optional
-from ..queries.list_rooms import ListRoomsQuery
-from ..ports.room_repository import RoomReadRepository
-from ..read_models import RoomReadModel
+from casino_service.application.ports.room_read_repository import RoomReadRepository
+from casino_service.application.queries.list_rooms import ListRoomsQuery
+from casino_service.application.read_models import RoomReadModel
 
 
 class ListRoomsHandler:
     def __init__(self, read_repo: RoomReadRepository):
         self._read_repo = read_repo
 
-    async def handle(self, query: ListRoomsQuery) -> Tuple[List[RoomReadModel], Optional[str]]:
+    async def handle(self, query: ListRoomsQuery) -> tuple[list[RoomReadModel], str | None]:
+        # Ограничение limit 1..100
         limit = max(1, min(100, query.limit))
 
         items, next_cursor = await self._read_repo.list(

@@ -1,8 +1,9 @@
 from grpc import aio
 from grpc_health.v1 import health, health_pb2, health_pb2_grpc
 
-async def create_server(address: str = "[::]:50053") -> tuple[aio.Server, int]: 
-    server = aio.server() 
+
+async def create_server(address: str = "[::]:50053") -> tuple[aio.Server, int]:
+    server = aio.server()
 
     health_service = health.aio.HealthServicer()
     health_pb2_grpc.add_HealthServicer_to_server(health_service, server)
@@ -18,6 +19,7 @@ async def create_server(address: str = "[::]:50053") -> tuple[aio.Server, int]:
         raise RuntimeError(f"Cannot bind gRPC server to {address}")
 
     return server, port
+
 
 async def serve() -> None:
     server, _ = await create_server()

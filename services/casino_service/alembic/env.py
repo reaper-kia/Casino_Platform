@@ -1,17 +1,12 @@
 import asyncio
 from logging.config import fileConfig
 
-from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
+from alembic import context
 from casino_service.core.config import settings
-from casino_service.infra.database import Base
-from casino_service.infra.models import (
-    CasinoPlayerModel,
-    RoomModel,
-    RoomParticipantModel,
-)
+from casino_service.infra.database.session import Base
 
 config = context.config
 
@@ -50,7 +45,7 @@ async def run_migrations_online() -> None:
     configuration = config.get_section(config.config_ini_section)
     if configuration is None:
         configuration = {}
-    
+
     configuration["sqlalchemy.url"] = settings.database_url
 
     connectable = async_engine_from_config(

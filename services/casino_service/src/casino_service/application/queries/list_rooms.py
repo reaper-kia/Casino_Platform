@@ -1,11 +1,12 @@
 from dataclasses import dataclass
-from typing import Optional
+
+from casino_service.domain.enums import GameType, RoomStatus, RoomVisibility
 
 
 @dataclass(frozen=True)
 class ListRoomsQuery:
-    game_type: Optional[str] = None
-    visibility: Optional[str] = None
-    status: Optional[str] = None
+    game_type: GameType | None = None
+    visibility: RoomVisibility | None = None
+    status: RoomStatus | None = None
     limit: int = 20
-    cursor: Optional[str] = None
+    cursor: str | None = None

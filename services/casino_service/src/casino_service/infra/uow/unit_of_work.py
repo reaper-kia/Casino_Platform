@@ -1,19 +1,17 @@
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from src.casino_service.application.ports.room_repository import (
-    RoomRepository,
-    CasinoPlayerRepository,
-    ProcessedCommandRepository,
-)
-from src.casino_service.application.ports.room_repository import (
-    RoomReadRepository,
-)
-from src.casino_service.infra.repositories import (
-    SQLAlchemyRoomRepository,
-    SQLAlchemyRoomReadRepository,
+from casino_service.application.ports.casino_player_repository import CasinoPlayerRepository
+from casino_service.application.ports.processed_command_repository import ProcessedCommandRepository
+from casino_service.application.ports.room_read_repository import RoomReadRepository
+from casino_service.application.ports.room_repository import RoomRepository
+from casino_service.infra.database.repositories.casino_player import (
     SQLAlchemyCasinoPlayerRepository,
+)
+from casino_service.infra.database.repositories.processed_command import (
     SQLAlchemyProcessedCommandRepository,
 )
+from casino_service.infra.database.repositories.room import SQLAlchemyRoomRepository
+from casino_service.infra.database.repositories.room_read import SQLAlchemyRoomReadRepository
 
 
 class SQLAlchemyUnitOfWork:
@@ -34,11 +32,10 @@ class SQLAlchemyUnitOfWork:
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        if exc_type is None:
-            await self.commit()
-        else:
+        if exc_type is not None:
             await self.rollback()
-        await self.session.close()
+        if self.session:
+            await self.session.close()
 
     async def commit(self) -> None:
         if self.session:
