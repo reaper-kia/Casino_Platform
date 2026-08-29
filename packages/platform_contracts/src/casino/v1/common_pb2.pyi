@@ -1,13 +1,12 @@
 import datetime
-from collections.abc import Iterable as _Iterable
-from collections.abc import Mapping as _Mapping
-from typing import ClassVar as _ClassVar
 
-from google.protobuf import descriptor as _descriptor
-from google.protobuf import message as _message
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
+from google.protobuf import descriptor as _descriptor
+from google.protobuf import message as _message
+from collections.abc import Iterable as _Iterable, Mapping as _Mapping
+from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -23,7 +22,6 @@ class CasinoPlayerStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     CASINO_PLAYER_STATUS_UNSPECIFIED: _ClassVar[CasinoPlayerStatus]
     CASINO_PLAYER_STATUS_ACTIVE: _ClassVar[CasinoPlayerStatus]
     CASINO_PLAYER_STATUS_BLOCKED: _ClassVar[CasinoPlayerStatus]
-
 GAME_TYPE_UNSPECIFIED: GameType
 GAME_TYPE_DICE_DUEL: GameType
 GAME_TYPE_CRASH: GameType
@@ -33,19 +31,14 @@ CASINO_PLAYER_STATUS_ACTIVE: CasinoPlayerStatus
 CASINO_PLAYER_STATUS_BLOCKED: CasinoPlayerStatus
 
 class RequestContext(_message.Message):
-    __slots__ = ("actor_identity_user_id", "permissions", "request_id")
+    __slots__ = ("request_id", "actor_identity_user_id", "permissions")
     REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
     ACTOR_IDENTITY_USER_ID_FIELD_NUMBER: _ClassVar[int]
     PERMISSIONS_FIELD_NUMBER: _ClassVar[int]
     request_id: str
     actor_identity_user_id: str
     permissions: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(
-        self,
-        request_id: str | None = ...,
-        actor_identity_user_id: str | None = ...,
-        permissions: _Iterable[str] | None = ...,
-    ) -> None: ...
+    def __init__(self, request_id: _Optional[str] = ..., actor_identity_user_id: _Optional[str] = ..., permissions: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class Money(_message.Message):
     __slots__ = ("amount_minor", "currency")
@@ -53,19 +46,10 @@ class Money(_message.Message):
     CURRENCY_FIELD_NUMBER: _ClassVar[int]
     amount_minor: int
     currency: str
-    def __init__(
-        self, amount_minor: int | None = ..., currency: str | None = ...
-    ) -> None: ...
+    def __init__(self, amount_minor: _Optional[int] = ..., currency: _Optional[str] = ...) -> None: ...
 
 class CasinoPlayerSummary(_message.Message):
-    __slots__ = (
-        "avatar_url",
-        "identity_user_id",
-        "nickname",
-        "player_id",
-        "status",
-        "updated_at",
-    )
+    __slots__ = ("player_id", "identity_user_id", "nickname", "avatar_url", "status", "updated_at")
     PLAYER_ID_FIELD_NUMBER: _ClassVar[int]
     IDENTITY_USER_ID_FIELD_NUMBER: _ClassVar[int]
     NICKNAME_FIELD_NUMBER: _ClassVar[int]
@@ -78,15 +62,4 @@ class CasinoPlayerSummary(_message.Message):
     avatar_url: str
     status: CasinoPlayerStatus
     updated_at: _timestamp_pb2.Timestamp
-    def __init__(
-        self,
-        player_id: str | None = ...,
-        identity_user_id: str | None = ...,
-        nickname: str | None = ...,
-        avatar_url: str | None = ...,
-        status: CasinoPlayerStatus | str | None = ...,
-        updated_at: datetime.datetime
-        | _timestamp_pb2.Timestamp
-        | _Mapping
-        | None = ...,
-    ) -> None: ...
+    def __init__(self, player_id: _Optional[str] = ..., identity_user_id: _Optional[str] = ..., nickname: _Optional[str] = ..., avatar_url: _Optional[str] = ..., status: _Optional[_Union[CasinoPlayerStatus, str]] = ..., updated_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...

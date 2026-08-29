@@ -1,15 +1,13 @@
 import datetime
-from collections.abc import Iterable as _Iterable
-from collections.abc import Mapping as _Mapping
-from typing import ClassVar as _ClassVar
 
-from google.protobuf import descriptor as _descriptor
-from google.protobuf import message as _message
+from casino.v1 import common_pb2 as _common_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
-
-from casino.v1 import common_pb2 as _common_pb2
+from google.protobuf import descriptor as _descriptor
+from google.protobuf import message as _message
+from collections.abc import Iterable as _Iterable, Mapping as _Mapping
+from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -30,7 +28,6 @@ class RouletteColor(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     ROULETTE_COLOR_RED: _ClassVar[RouletteColor]
     ROULETTE_COLOR_BLACK: _ClassVar[RouletteColor]
     ROULETTE_COLOR_GREEN: _ClassVar[RouletteColor]
-
 ROUND_STATUS_UNSPECIFIED: RoundStatus
 ROUND_STATUS_SCHEDULED: RoundStatus
 ROUND_STATUS_BETTING: RoundStatus
@@ -45,13 +42,7 @@ ROULETTE_COLOR_BLACK: RouletteColor
 ROULETTE_COLOR_GREEN: RouletteColor
 
 class FairnessPublicData(_message.Message):
-    __slots__ = (
-        "algorithm_version",
-        "client_seed",
-        "nonce",
-        "server_seed",
-        "server_seed_hash",
-    )
+    __slots__ = ("server_seed_hash", "server_seed", "client_seed", "nonce", "algorithm_version")
     SERVER_SEED_HASH_FIELD_NUMBER: _ClassVar[int]
     SERVER_SEED_FIELD_NUMBER: _ClassVar[int]
     CLIENT_SEED_FIELD_NUMBER: _ClassVar[int]
@@ -62,29 +53,10 @@ class FairnessPublicData(_message.Message):
     client_seed: str
     nonce: int
     algorithm_version: str
-    def __init__(
-        self,
-        server_seed_hash: str | None = ...,
-        server_seed: str | None = ...,
-        client_seed: str | None = ...,
-        nonce: int | None = ...,
-        algorithm_version: str | None = ...,
-    ) -> None: ...
+    def __init__(self, server_seed_hash: _Optional[str] = ..., server_seed: _Optional[str] = ..., client_seed: _Optional[str] = ..., nonce: _Optional[int] = ..., algorithm_version: _Optional[str] = ...) -> None: ...
 
 class RoundSummary(_message.Message):
-    __slots__ = (
-        "betting_started_at",
-        "completed_at",
-        "configuration_version",
-        "created_at",
-        "game_type",
-        "revision",
-        "room_id",
-        "round_id",
-        "round_number",
-        "started_at",
-        "status",
-    )
+    __slots__ = ("round_id", "room_id", "game_type", "round_number", "status", "revision", "configuration_version", "created_at", "betting_started_at", "started_at", "completed_at")
     ROUND_ID_FIELD_NUMBER: _ClassVar[int]
     ROOM_ID_FIELD_NUMBER: _ClassVar[int]
     GAME_TYPE_FIELD_NUMBER: _ClassVar[int]
@@ -107,47 +79,17 @@ class RoundSummary(_message.Message):
     betting_started_at: _timestamp_pb2.Timestamp
     started_at: _timestamp_pb2.Timestamp
     completed_at: _timestamp_pb2.Timestamp
-    def __init__(
-        self,
-        round_id: str | None = ...,
-        room_id: str | None = ...,
-        game_type: _common_pb2.GameType | str | None = ...,
-        round_number: int | None = ...,
-        status: RoundStatus | str | None = ...,
-        revision: int | None = ...,
-        configuration_version: str | None = ...,
-        created_at: datetime.datetime
-        | _timestamp_pb2.Timestamp
-        | _Mapping
-        | None = ...,
-        betting_started_at: datetime.datetime
-        | _timestamp_pb2.Timestamp
-        | _Mapping
-        | None = ...,
-        started_at: datetime.datetime
-        | _timestamp_pb2.Timestamp
-        | _Mapping
-        | None = ...,
-        completed_at: datetime.datetime
-        | _timestamp_pb2.Timestamp
-        | _Mapping
-        | None = ...,
-    ) -> None: ...
+    def __init__(self, round_id: _Optional[str] = ..., room_id: _Optional[str] = ..., game_type: _Optional[_Union[_common_pb2.GameType, str]] = ..., round_number: _Optional[int] = ..., status: _Optional[_Union[RoundStatus, str]] = ..., revision: _Optional[int] = ..., configuration_version: _Optional[str] = ..., created_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., betting_started_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., started_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., completed_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class DiceRollResult(_message.Message):
-    __slots__ = ("player_id", "total", "values")
+    __slots__ = ("player_id", "values", "total")
     PLAYER_ID_FIELD_NUMBER: _ClassVar[int]
     VALUES_FIELD_NUMBER: _ClassVar[int]
     TOTAL_FIELD_NUMBER: _ClassVar[int]
     player_id: str
     values: _containers.RepeatedScalarFieldContainer[int]
     total: int
-    def __init__(
-        self,
-        player_id: str | None = ...,
-        values: _Iterable[int] | None = ...,
-        total: int | None = ...,
-    ) -> None: ...
+    def __init__(self, player_id: _Optional[str] = ..., values: _Optional[_Iterable[int]] = ..., total: _Optional[int] = ...) -> None: ...
 
 class DiceDuelResult(_message.Message):
     __slots__ = ("player_rolls", "winner_player_id")
@@ -155,36 +97,24 @@ class DiceDuelResult(_message.Message):
     WINNER_PLAYER_ID_FIELD_NUMBER: _ClassVar[int]
     player_rolls: _containers.RepeatedCompositeFieldContainer[DiceRollResult]
     winner_player_id: str
-    def __init__(
-        self,
-        player_rolls: _Iterable[DiceRollResult | _Mapping] | None = ...,
-        winner_player_id: str | None = ...,
-    ) -> None: ...
+    def __init__(self, player_rolls: _Optional[_Iterable[_Union[DiceRollResult, _Mapping]]] = ..., winner_player_id: _Optional[str] = ...) -> None: ...
 
 class CrashResult(_message.Message):
     __slots__ = ("crash_multiplier_millis",)
     CRASH_MULTIPLIER_MILLIS_FIELD_NUMBER: _ClassVar[int]
     crash_multiplier_millis: int
-    def __init__(self, crash_multiplier_millis: int | None = ...) -> None: ...
+    def __init__(self, crash_multiplier_millis: _Optional[int] = ...) -> None: ...
 
 class RouletteResult(_message.Message):
-    __slots__ = ("color", "winning_pocket")
+    __slots__ = ("winning_pocket", "color")
     WINNING_POCKET_FIELD_NUMBER: _ClassVar[int]
     COLOR_FIELD_NUMBER: _ClassVar[int]
     winning_pocket: str
     color: RouletteColor
-    def __init__(
-        self, winning_pocket: str | None = ..., color: RouletteColor | str | None = ...
-    ) -> None: ...
+    def __init__(self, winning_pocket: _Optional[str] = ..., color: _Optional[_Union[RouletteColor, str]] = ...) -> None: ...
 
 class RoundSnapshot(_message.Message):
-    __slots__ = (
-        "crash_result",
-        "dice_duel_result",
-        "fairness",
-        "roulette_result",
-        "round",
-    )
+    __slots__ = ("round", "fairness", "dice_duel_result", "crash_result", "roulette_result")
     ROUND_FIELD_NUMBER: _ClassVar[int]
     FAIRNESS_FIELD_NUMBER: _ClassVar[int]
     DICE_DUEL_RESULT_FIELD_NUMBER: _ClassVar[int]
@@ -195,14 +125,7 @@ class RoundSnapshot(_message.Message):
     dice_duel_result: DiceDuelResult
     crash_result: CrashResult
     roulette_result: RouletteResult
-    def __init__(
-        self,
-        round: RoundSummary | _Mapping | None = ...,
-        fairness: FairnessPublicData | _Mapping | None = ...,
-        dice_duel_result: DiceDuelResult | _Mapping | None = ...,
-        crash_result: CrashResult | _Mapping | None = ...,
-        roulette_result: RouletteResult | _Mapping | None = ...,
-    ) -> None: ...
+    def __init__(self, round: _Optional[_Union[RoundSummary, _Mapping]] = ..., fairness: _Optional[_Union[FairnessPublicData, _Mapping]] = ..., dice_duel_result: _Optional[_Union[DiceDuelResult, _Mapping]] = ..., crash_result: _Optional[_Union[CrashResult, _Mapping]] = ..., roulette_result: _Optional[_Union[RouletteResult, _Mapping]] = ...) -> None: ...
 
 class GetRoundRequest(_message.Message):
     __slots__ = ("context", "round_id")
@@ -210,17 +133,13 @@ class GetRoundRequest(_message.Message):
     ROUND_ID_FIELD_NUMBER: _ClassVar[int]
     context: _common_pb2.RequestContext
     round_id: str
-    def __init__(
-        self,
-        context: _common_pb2.RequestContext | _Mapping | None = ...,
-        round_id: str | None = ...,
-    ) -> None: ...
+    def __init__(self, context: _Optional[_Union[_common_pb2.RequestContext, _Mapping]] = ..., round_id: _Optional[str] = ...) -> None: ...
 
 class GetRoundResponse(_message.Message):
     __slots__ = ("snapshot",)
     SNAPSHOT_FIELD_NUMBER: _ClassVar[int]
     snapshot: RoundSnapshot
-    def __init__(self, snapshot: RoundSnapshot | _Mapping | None = ...) -> None: ...
+    def __init__(self, snapshot: _Optional[_Union[RoundSnapshot, _Mapping]] = ...) -> None: ...
 
 class GetCurrentRoundRequest(_message.Message):
     __slots__ = ("context", "room_id")
@@ -228,20 +147,16 @@ class GetCurrentRoundRequest(_message.Message):
     ROOM_ID_FIELD_NUMBER: _ClassVar[int]
     context: _common_pb2.RequestContext
     room_id: str
-    def __init__(
-        self,
-        context: _common_pb2.RequestContext | _Mapping | None = ...,
-        room_id: str | None = ...,
-    ) -> None: ...
+    def __init__(self, context: _Optional[_Union[_common_pb2.RequestContext, _Mapping]] = ..., room_id: _Optional[str] = ...) -> None: ...
 
 class GetCurrentRoundResponse(_message.Message):
     __slots__ = ("snapshot",)
     SNAPSHOT_FIELD_NUMBER: _ClassVar[int]
     snapshot: RoundSnapshot
-    def __init__(self, snapshot: RoundSnapshot | _Mapping | None = ...) -> None: ...
+    def __init__(self, snapshot: _Optional[_Union[RoundSnapshot, _Mapping]] = ...) -> None: ...
 
 class ListRoundsRequest(_message.Message):
-    __slots__ = ("context", "cursor", "limit", "room_id", "status")
+    __slots__ = ("context", "room_id", "status", "limit", "cursor")
     CONTEXT_FIELD_NUMBER: _ClassVar[int]
     ROOM_ID_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
@@ -252,26 +167,15 @@ class ListRoundsRequest(_message.Message):
     status: RoundStatus
     limit: int
     cursor: str
-    def __init__(
-        self,
-        context: _common_pb2.RequestContext | _Mapping | None = ...,
-        room_id: str | None = ...,
-        status: RoundStatus | str | None = ...,
-        limit: int | None = ...,
-        cursor: str | None = ...,
-    ) -> None: ...
+    def __init__(self, context: _Optional[_Union[_common_pb2.RequestContext, _Mapping]] = ..., room_id: _Optional[str] = ..., status: _Optional[_Union[RoundStatus, str]] = ..., limit: _Optional[int] = ..., cursor: _Optional[str] = ...) -> None: ...
 
 class ListRoundsResponse(_message.Message):
-    __slots__ = ("next_cursor", "rounds")
+    __slots__ = ("rounds", "next_cursor")
     ROUNDS_FIELD_NUMBER: _ClassVar[int]
     NEXT_CURSOR_FIELD_NUMBER: _ClassVar[int]
     rounds: _containers.RepeatedCompositeFieldContainer[RoundSummary]
     next_cursor: str
-    def __init__(
-        self,
-        rounds: _Iterable[RoundSummary | _Mapping] | None = ...,
-        next_cursor: str | None = ...,
-    ) -> None: ...
+    def __init__(self, rounds: _Optional[_Iterable[_Union[RoundSummary, _Mapping]]] = ..., next_cursor: _Optional[str] = ...) -> None: ...
 
 class ReadyAction(_message.Message):
     __slots__ = ()
@@ -285,18 +189,10 @@ class CashOutAction(_message.Message):
     __slots__ = ("bet_id",)
     BET_ID_FIELD_NUMBER: _ClassVar[int]
     bet_id: str
-    def __init__(self, bet_id: str | None = ...) -> None: ...
+    def __init__(self, bet_id: _Optional[str] = ...) -> None: ...
 
 class SubmitRoundActionRequest(_message.Message):
-    __slots__ = (
-        "cash_out",
-        "context",
-        "expected_revision",
-        "idempotency_key",
-        "ready",
-        "round_id",
-        "throw_dice",
-    )
+    __slots__ = ("context", "round_id", "ready", "throw_dice", "cash_out", "expected_revision", "idempotency_key")
     CONTEXT_FIELD_NUMBER: _ClassVar[int]
     ROUND_ID_FIELD_NUMBER: _ClassVar[int]
     READY_FIELD_NUMBER: _ClassVar[int]
@@ -311,19 +207,10 @@ class SubmitRoundActionRequest(_message.Message):
     cash_out: CashOutAction
     expected_revision: int
     idempotency_key: str
-    def __init__(
-        self,
-        context: _common_pb2.RequestContext | _Mapping | None = ...,
-        round_id: str | None = ...,
-        ready: ReadyAction | _Mapping | None = ...,
-        throw_dice: ThrowDiceAction | _Mapping | None = ...,
-        cash_out: CashOutAction | _Mapping | None = ...,
-        expected_revision: int | None = ...,
-        idempotency_key: str | None = ...,
-    ) -> None: ...
+    def __init__(self, context: _Optional[_Union[_common_pb2.RequestContext, _Mapping]] = ..., round_id: _Optional[str] = ..., ready: _Optional[_Union[ReadyAction, _Mapping]] = ..., throw_dice: _Optional[_Union[ThrowDiceAction, _Mapping]] = ..., cash_out: _Optional[_Union[CashOutAction, _Mapping]] = ..., expected_revision: _Optional[int] = ..., idempotency_key: _Optional[str] = ...) -> None: ...
 
 class SubmitRoundActionResponse(_message.Message):
     __slots__ = ("snapshot",)
     SNAPSHOT_FIELD_NUMBER: _ClassVar[int]
     snapshot: RoundSnapshot
-    def __init__(self, snapshot: RoundSnapshot | _Mapping | None = ...) -> None: ...
+    def __init__(self, snapshot: _Optional[_Union[RoundSnapshot, _Mapping]] = ...) -> None: ...
